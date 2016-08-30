@@ -206,22 +206,6 @@ module Openapi
       end
 
       class_methods do
-        def index_json_config(hash)
-          self.index_json_config = hash
-        end
-
-        def create_json_config(hash)
-          self.create_json_config = hash
-        end
-
-        def show_json_config(hash)
-          self.show_json_config = hash
-        end
-
-        def update_json_config(hash)
-          self.update_json_config = hash
-        end
-
         def resource_class(name)
           self.resource_class = name
         end

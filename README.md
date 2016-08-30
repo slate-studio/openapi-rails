@@ -1,4 +1,4 @@
-<img src="http://www.kra.vc/_Media/swagger-logo.png" align="right" width="120px" />
+<img src="http://www.kra.vc/_Media/swagger-logo.png" align="right" width="100px" />
 
 [![Gem Version](https://badge.fury.io/rb/openapi-rails.svg)](https://badge.fury.io/rb/openapi-rails)
 
@@ -63,8 +63,8 @@ Rails.application.routes.draw do
 end
 ```
 
-Check out the `config/initializer/openapi.rb` configuration and add new
-controller to be included in JSON specification:
+Add `Api::ProjectsController` to `config/initializer/openapi.rb` controllers
+arrays of the default configuration:
 
 ```ruby
 Openapi.configure do |config|
@@ -84,33 +84,143 @@ Restart develoment server and open [http://localhost:3000/openapi](http://localh
 
 ![OpenAPI Rails Demo](https://d3vv6lp55qjaqc.cloudfront.net/items/262y2S3Q3N0u14160a20/openapi-rails-demo.png)
 
+Meta information about mapped actions and model fields is pulled automatically
+on project initialization. Changes in `routes.rb` or models would require server
+restart to be reflected in documentation.
 
-## CSV
+In documentation interface for `create` and `update` actions request `Example
+Value` includes only required fields. Other model fields should be added
+manually.
+
+
+## Supported Features
+
+Following features are supported out of the box:
+
+  - pagination via [kaminari](https://github.com/amatsuda/kaminari)
+  - has_scope via [has_scope](https://github.com/plataformatec/has_scope)
+  - search via [mongoid-search](https://github.com/mauriciozaffari/mongoid_search)
+  - version via [mongoid-history](https://github.com/aq1018/mongoid-history)
+  - `CSV` format for `index` action, requires `.csv` format to be added to the
+    request url, e.g. `/api/posts.csv`.
 
 
 ## Customization
 
- - json
- - has_scope
- - per_page
- - resource_class
+In the controller there is a way override default behaviour with helpers:
+
+  - `per_page` — set page size (default `50`) for `index` action
+  - `resource_class` — set model class manually
+  - `resource_params` — override default method that allows everything
 
 
 ## Custom Actions
 
- - warning
- - building spec for custom actions
+Mapped custom actions (not CRUD) will add a log message on server start that
+controller misses specification. As a result they are not added to
+documentation.
+
+Specification for custom methods should be added manually. Check out
+[Swagger Blocks](https://github.com/fotinakis/swagger-blocks) gem or
+[specification builder](https://github.com/slate-studio/openapi-rails/blob/master/lib/openapi/mongoid/spec_builder.rb) code for the reference.
+
+Here is an example of custom method specification:
+
+```ruby
+module Api
+  class ProjectsController < BaseController
+    def custom_resource_action
+      # TODO: Method implemetation goes here.
+    end
+
+    swagger_path "/projects/{id}/custom_resource_action" do
+      operation :get do
+        key :tags,        ["Projects"]
+        key :summary,     'Show extra details'
+        key :operationId, "showExtraProjectDetailsById"
+        key :produces,    %w(application/json)
+
+        parameter do
+          key :name,     :id
+          key :type,     :string
+          key :in,       :path
+          key :required, true
+        end
+
+        response 200 do
+          schema do
+            key :'$ref', "Project"
+          end
+        end
+      end
+    end
+  end
+end
+```
 
 
 ## Multiple APIs
 
- - configuration options
+There is a clean way to provide multiple APIs or API versions.
+
+Here is an example of setting up two API versions:
+
+`config/routes.rb`:
+
+```ruby
+Rails.application.routes.draw do
+  namespace :api do
+    namespace :v1 do
+      crud :projects
+      mount_openapi_specification name: :v1
+    end
+
+    namespace :v2 do
+      crud :projects
+      mount_openapi_specification name: :v2
+    end
+  end
+
+  mount_openapi_documentation
+end
+```
+
+`config/initializer/openapi.rb`:
+
+```ruby
+Openapi.configure do |config|
+  config.apis = {
+    v1: {
+      title: 'Version 1',
+      description: 'Legacy API version, please check out Version 2.',
+      version: '1.0',
+      base_path: '/api/v1',
+      controllers: [Api::V1::ProjectsController]
+    },
+    v2: {
+      title: 'Version 2',
+      description: 'Latest stable API version.',
+      version: '2.0',
+      base_path: '/api/v2',
+      controllers: [Api::V2::ProjectsController]
+    }
+  }
+end
+```
+
+Controllers with custom logic would be placed at `app/controllers/api/v1` and
+`app/controllers/api/v2` modules.
+
+![OpenAPI Rails — Multiple versions demo](http://files.slatestudio.com/hJjg/openapi-rails-multiple-versions.png)
 
 
 ## Contributors
 
- - Alexander Kravets
- - Denis Popov
+ - [Alexander Kravets](http://www.kra.vc)
+ - [Denis Popov](https://github.com/DenisPopov15)
+
+If you have any ideas or questions please feel free to reach out! PRs are
+welcome, tests are on the roadmap.
 
 
-`OpenAPI Rails` gem is maintained and funded by [Slate Studio LLC](https://www.slatestudio.com)
+`OpenAPI Rails` gem is maintained and funded by [Slate Studio LLC](https://www.slatestudio.com).
