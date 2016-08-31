@@ -2,7 +2,7 @@ Openapi.configure do |config|
   config.apis = {
     default: {
       title: 'Default',
-      description: '',
+      description: 'API configuration is in `config/initializers/openapi.rb`.',
       version: '1.0',
       base_path: '/api',
       controllers: []
