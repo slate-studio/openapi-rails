@@ -122,7 +122,7 @@ documentation.
 
 Specification for custom methods should be added manually. Check out
 [Swagger Blocks](https://github.com/fotinakis/swagger-blocks) gem or
-[specification builder](https://github.com/slate-studio/openapi-rails/blob/master/lib/openapi/mongoid/spec_builder.rb) code for the reference.
+[specification builder](https://github.com/slate-studio/openapi-rails/blob/master/lib/openapi/mongoid/spec_builder.rb) code for DSL reference.
 
 Here is an example of custom method specification:
 
@@ -211,7 +211,7 @@ end
 Controllers with custom logic would be placed at `app/controllers/api/v1` and
 `app/controllers/api/v2` modules.
 
-![OpenAPI Rails — Multiple versions demo](http://files.slatestudio.com/hJjg/openapi-rails-multiple-versions.png)
+![OpenAPI Rails — Multiple versions demo](https://d3vv6lp55qjaqc.cloudfront.net/items/3J200Q0m2m0V2m0Q3V2i/openapi-rails-multiple-versions.png)
 
 
 ## Contributors
