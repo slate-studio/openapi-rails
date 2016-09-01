@@ -239,6 +239,7 @@ module Openapi
                   end
 
                   response 200 do
+                    key :description, 'Success'
                     schema type: :array do
                       items do
                         key :'$ref', name
@@ -287,6 +288,7 @@ module Openapi
                   end
 
                   response 201 do
+                    key :description, 'Success'
                     schema do
                       key :'$ref', name
                     end
@@ -336,6 +338,7 @@ module Openapi
                   end
 
                   response 200 do
+                    key :description, 'Success'
                     schema do
                       key :'$ref', name
                     end
@@ -389,6 +392,7 @@ module Openapi
                   end
 
                   response 200 do
+                    key :description, 'Success'
                     schema do
                       key :'$ref', name
                     end
@@ -410,7 +414,7 @@ module Openapi
                   end
 
                   response 204 do
-                    key :description, "#{name} destroyed"
+                    key :description, 'Success'
                   end
                 end
               end
