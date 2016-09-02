@@ -10,6 +10,7 @@ integration.
 
 **This gem supports only Mongoid, for other ORMs RPs are welcome.**
 
+[Demo](https://openapi-demo1.herokuapp.com/openapi#/Books) project for basic `openapi-rails` integration.
 
 ## Installation
 
@@ -212,6 +213,12 @@ Controllers with custom logic would be placed at `app/controllers/api/v1` and
 `app/controllers/api/v2` modules.
 
 ![OpenAPI Rails — Multiple versions demo](https://d3vv6lp55qjaqc.cloudfront.net/items/3J200Q0m2m0V2m0Q3V2i/openapi-rails-multiple-versions.png)
+
+
+## Related Documents
+
+  - [OpenAPI ❤️ Rails](http://www.kra.vc/openapi-rails) — tutorial for setting
+  up a new rails project with OpenAPI support.
 
 
 ## Contributors
