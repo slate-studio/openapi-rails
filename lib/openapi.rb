@@ -8,13 +8,11 @@ require 'has_scope'
 require 'responders'
 require 'renderers/csv'
 require 'kaminari'
-require 'openapi/mongoid/crud_actions'
 
 require 'swagger/blocks/schema_builder'
 require 'swagger/blocks/schema_node'
 require 'swagger/blocks/property_node'
 require 'swagger/blocks/items_node'
-require 'openapi/mongoid/spec_builder'
 
 require 'openapi/configuration'
 require 'openapi/routes_parser'
