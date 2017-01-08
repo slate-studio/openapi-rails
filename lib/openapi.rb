@@ -7,7 +7,6 @@ require 'rails/routes'
 require 'has_scope'
 require 'responders'
 require 'renderers/csv'
-require 'openapi/mongoid/crud_actions'
 
 require 'swagger/blocks/schema_builder'
 require 'swagger/blocks/schema_node'
@@ -18,6 +17,9 @@ require 'openapi/configuration'
 require 'openapi/routes_parser'
 require 'openapi/engine'
 require 'openapi/version'
+
+require 'openapi/mongoid'      if defined?(Mongoid)
+require 'openapi/activerecord' if defined?(ActiveRecord)
 
 module Openapi
   extend Configuration
