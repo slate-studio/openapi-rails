@@ -98,7 +98,6 @@ manually.
 
 Following features are supported out of the box:
 
-  - pagination via [kaminari](https://github.com/amatsuda/kaminari)
   - has_scope via [has_scope](https://github.com/plataformatec/has_scope)
   - search via [mongoid-search](https://github.com/mauriciozaffari/mongoid_search)
   - version via [mongoid-history](https://github.com/aq1018/mongoid-history)
@@ -110,9 +109,20 @@ Following features are supported out of the box:
 
 In the controller there is a way override default behaviour with helpers:
 
-  - `per_page` — set page size (default `50`) for `index` action
-  - `resource_class` — set model class manually
-  - `resource_params` — override default method that allows everything
+  - `paginates_per(number)` — set page size (default `50`) for `index` action
+  - `resource_class(klass)` — set model class manually
+  - `def resource_params` — override default method that allows everything
+
+Helpers to customize specification build:
+
+  - `spec_params(options)`
+
+Supported specification `options`:
+  - `collection_name` —
+  - `resource_name` —
+  - `resource_class` —
+  - `except_actions` —
+  - `relative_path` —
 
 
 ## Custom Actions

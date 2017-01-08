@@ -19,11 +19,9 @@ Gem::Specification.new do |s|
   s.platform         = Gem::Platform::RUBY
 
   # DSL for pure Ruby code blocks that can be turned into JSON
-  s.add_dependency 'swagger-blocks'
+  s.add_dependency 'swagger-blocks', '~> 2.0'
   # A set of Rails responders to dry up application controllers
   s.add_dependency 'responders', '~> 2.3'
-  # Clean, powerful, customizable and sophisticated paginator
-  s.add_dependency 'kaminari'
   # C extensions to accelerate the Ruby BSON serialization
   s.add_dependency 'bson_ext'
   # Fast streaming JSON parsing and encoding library for Ruby

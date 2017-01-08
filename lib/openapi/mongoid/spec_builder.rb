@@ -21,7 +21,7 @@ module Openapi
 
         controller_classes.each do |c|
           tag do
-            key :name, c.openapi_collection_name
+            key :name, c.spec_collection_name
           end
         end
       end
@@ -37,42 +37,42 @@ module Openapi
       included do
         include Swagger::Blocks
 
-        class_attribute :openapi_collection_name
-        class_attribute :openapi_resource_name
-        class_attribute :openapi_resource_class
-        class_attribute :openapi_except_actions
-        class_attribute :openapi_relative_path
+        class_attribute :spec_collection_name
+        class_attribute :spec_resource_name
+        class_attribute :spec_resource_class
+        class_attribute :spec_except_actions
+        class_attribute :spec_relative_path
 
-        class_attribute :openapi_base_path
+        class_attribute :spec_base_path
       end
 
       class_methods do
-        def openapi_config(options)
-          self.openapi_collection_name = options[:collection_name]
-          self.openapi_resource_name   = options[:resource_name]
-          self.openapi_resource_class  = options[:resource_class]
-          self.openapi_except_actions  = options[:except_actions]
-          self.openapi_relative_path   = options[:relative_path]
+        def spec_params(options)
+          self.spec_collection_name = options[:collection_name]
+          self.spec_resource_name   = options[:resource_name]
+          self.spec_resource_class  = options[:resource_class]
+          self.spec_except_actions  = options[:except_actions]
+          self.spec_relative_path   = options[:relative_path]
         end
 
         def build_openapi_specification(options)
-          self.openapi_base_path = options[:base_path]
+          self.spec_base_path = options[:base_path]
 
-          self.openapi_relative_path ||=
+          self.spec_relative_path ||=
             ('/' + to_s.remove(/Controller$/).gsub('::', '/').underscore).
-              remove(openapi_base_path)
+              remove(spec_base_path)
 
-          self.openapi_except_actions ||= []
+          self.spec_except_actions ||= []
 
-          self.openapi_collection_name ||=
+          self.spec_collection_name ||=
             to_s.split('::').last.sub(/Controller$/, '')
 
-          self.openapi_resource_name ||=
-            self.openapi_collection_name.singularize
+          self.spec_resource_name ||=
+            self.spec_collection_name.singularize
 
-          self.openapi_resource_class ||= self.try(:resource_class)
-          self.openapi_resource_class ||=
-            self.openapi_resource_name.constantize
+          self.spec_resource_class ||= self.try(:crud_resource_class)
+          self.spec_resource_class ||=
+            self.spec_resource_name.constantize
 
           build_openapi_definitions
           build_openapi_paths
@@ -88,9 +88,9 @@ module Openapi
         end
 
         def build_openapi_definitions
-          collection_name = openapi_collection_name
-          resource_class = openapi_resource_class
-          resource_name = openapi_resource_name
+          collection_name = spec_collection_name
+          resource_class = spec_resource_class
+          resource_name = spec_resource_name
           resource_property_name = resource_name.underscore.to_sym
 
           swagger_schema resource_name do
@@ -103,6 +103,12 @@ module Openapi
                 relation_name =
                   relation.name.to_s.singularize.titleize.remove(' ')
 
+                # TODO: This is not accurate, class might be in the same
+                #       namespace as related.
+                # namespace = resource_class.to_s.split('::')[0...-1].join('::')
+                # generated_embedded_resource_class_name = [namespace, relation_name].join('::')
+
+                # TODO: Add error handler in case class is not guessed here.
                 embedded_resource_class =
                   (relation.class_name || relation_name).constantize
 
@@ -131,32 +137,31 @@ module Openapi
         end
 
         def build_crud_specification(routes)
-          name        = openapi_resource_name
+          name        = spec_resource_name
           sym_name    = name.underscore.to_sym
-          plural_name = openapi_collection_name
-          path        = openapi_relative_path
+          plural_name = spec_collection_name
+          path        = spec_relative_path
           scopes      = try(:scopes_configuration) || []
           actions     = routes.map {|r| r[2]}.uniq
           json_mime   = %w(application/json)
 
           include_index   = actions.include?('index') &&
-                            !openapi_except_actions.include?('index')
+                            !spec_except_actions.include?('index')
           include_create  = actions.include?('create') &&
-                            !openapi_except_actions.include?('create')
+                            !spec_except_actions.include?('create')
           include_show    = actions.include?('show') &&
-                            !openapi_except_actions.include?('show')
+                            !spec_except_actions.include?('show')
           include_update  = actions.include?('update') &&
-                            !openapi_except_actions.include?('update')
+                            !spec_except_actions.include?('update')
           include_destroy = actions.include?('destroy') &&
-                            !openapi_except_actions.include?('destroy')
+                            !spec_except_actions.include?('destroy')
 
           include_collection_actions =
             (include_index || include_create)
           include_resource_actions =
             (include_show || include_update || include_destroy)
 
-          support_search = openapi_resource_class.instance_methods(false)
-                                                 .include?(:search)
+          support_search = spec_resource_class.methods.include?(:search)
 
           if include_collection_actions
             swagger_path path do
@@ -426,7 +431,7 @@ module Openapi
           custom_routes = routes.select {|r| !CRUD_ACTIONS.include?(r[2])}
           no_spec_methods = custom_routes.select do |route|
             method = route[0].to_sym
-            path = route[1].remove(openapi_base_path)
+            path = route[1].remove(spec_base_path)
             path_sym = path.gsub(/:(\w+)/, '{\1}').to_sym
 
             ! action_specification_exists?(method, path_sym)

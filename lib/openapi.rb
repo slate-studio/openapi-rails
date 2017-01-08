@@ -7,7 +7,6 @@ require 'rails/routes'
 require 'has_scope'
 require 'responders'
 require 'renderers/csv'
-require 'kaminari'
 require 'openapi/mongoid/crud_actions'
 
 require 'swagger/blocks/schema_builder'

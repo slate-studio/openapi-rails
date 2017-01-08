@@ -1,7 +1,9 @@
 module Swagger
   module Blocks
-    class PropertyNode
-      include SchemaBuilder
+    module Nodes
+      class PropertyNode
+        include SchemaBuilder
+      end
     end
   end
 end

@@ -3,12 +3,22 @@ module Openapi
     module CrudActions
       extend ActiveSupport::Concern
 
+      class_methods do
+        def resource_class(klass)
+          self.crud_resource_class = klass
+        end
+
+        def paginates_per(number)
+          self.crud_per_page = number
+        end
+      end
+
       included do
         respond_to :json
         respond_to :csv, only: %w(index)
 
-        class_attribute :resource_class
-        class_attribute :per_page
+        class_attribute :crud_resource_class
+        class_attribute :crud_per_page
 
         ## Actions
 
@@ -104,7 +114,7 @@ module Openapi
         end
 
         def resource_class
-          @resource_class ||= self.class.resource_class
+          @resource_class ||= self.class.crud_resource_class
           @resource_class ||= self.class.
                                    to_s.
                                    split('::').
@@ -147,40 +157,48 @@ module Openapi
         end
 
         def search_filter_chain!
-          query = params[:search]
-          if query && support_search?
+          query = params[:search] || ''
+          if !query.empty? && support_search?
             normalized_query = query.to_s.downcase
             @chain = @chain.search(normalized_query, match: :all)
           end
         end
 
         def page
-          @page ||= params[:page]
+          @page ||= (params[:page] || 1).to_i
         end
 
         def per_page
-          @per_page ||= (params[:perPage] || self.class.per_page || 50)
-        end
-
-        def paginate_chain!
-          @chain = begin
-            if page
-              @chain.page(page).per(per_page)
+          @per_page ||= begin
+            value = params[:perPage].try(:to_i)
+            if value.nil?
+              self.class.crud_per_page || 25
+            elsif value == 0
+              25
             else
-              @chain.all
+              value
             end
           end
         end
 
-        def set_index_headers!
-          total_objects = page ? @chain.total_count : @chain.size
-          response.headers['X-Total-Count'] = total_objects
+        def paginate_chain!
+          @unpaginated_chain = @chain
+          @chain = @chain.skip((page - 1) * per_page).limit(per_page)
+        end
 
-          if page and !@chain.last_page?
-            url = request.url
-            url.gsub!("page=#{page}", "page=#{@chain.next_page}")
-            next_page = "<#{url}>; rel=\"next\""
-            response.headers['Link'] = next_page
+        def last_page?(total_number)
+          total_number <= (page - 1) * per_page + per_page
+        end
+
+        def set_index_headers!
+          unpaginated_chain_size = @chain.count
+          response.headers['X-Page'] = page
+          response.headers['X-Total-Count'] = unpaginated_chain_size
+          response.headers['X-Pages-Count'] = (unpaginated_chain_size.to_f / per_page).ceil
+          response.headers['X-Per-Page']    = per_page
+
+          unless last_page?(unpaginated_chain_size)
+            response.headers['X-Next-Page'] = page + 1
           end
         end
 
@@ -202,16 +220,6 @@ module Openapi
             underscore.
             gsub('/', '_').
             gsub('::', '_')
-        end
-      end
-
-      class_methods do
-        def resource_class(name)
-          self.resource_class = name
-        end
-
-        def per_page(number)
-          self.per_page = number
         end
       end
     end
