@@ -16,6 +16,7 @@ require 'swagger/blocks/items_node'
 require 'openapi/configuration'
 require 'openapi/routes_parser'
 require 'openapi/engine'
+require 'openapi/middleware'
 require 'openapi/version'
 
 require 'openapi/mongoid'      if defined?(Mongoid)
