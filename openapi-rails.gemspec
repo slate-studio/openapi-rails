@@ -28,8 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'bson_ext'
   # Fast streaming JSON parsing and encoding library for Ruby
   s.add_dependency 'yajl-ruby'
-  # Ruby ODM framework for MongoDB
-  s.add_dependency 'mongoid'
   # Map incoming controller parameters to named scopes in resources
   s.add_dependency 'has_scope'
 end
