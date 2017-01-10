@@ -48,31 +48,32 @@ module Openapi
 
       class_methods do
         def spec_params(options)
-          self.spec_collection_name = options[:collection_name]
-          self.spec_resource_name   = options[:resource_name]
           self.spec_resource_class  = options[:resource_class]
-          self.spec_except_actions  = options[:except_actions]
+          self.spec_resource_name   = options[:resource_name]
+          self.spec_collection_name = options[:collection_name]
           self.spec_relative_path   = options[:relative_path]
+          self.spec_except_actions  = options[:except_actions]
         end
 
         def build_openapi_specification(options)
-          self.spec_base_path = options[:base_path]
+          self.spec_except_actions ||=
+            []
+
+          self.spec_base_path =
+            options[:base_path]
 
           self.spec_relative_path ||=
             ('/' + to_s.remove(/Controller$/).gsub('::', '/').underscore).
               remove(spec_base_path)
 
-          self.spec_except_actions ||= []
-
-          self.spec_collection_name ||=
-            to_s.split('::').last.sub(/Controller$/, '')
+          self.spec_resource_class ||=
+            self.try(:crud_resource_class)
 
           self.spec_resource_name ||=
-            self.spec_collection_name.singularize
+            self.spec_resource_class.to_s.remove('::')
 
-          self.spec_resource_class ||= self.try(:crud_resource_class)
-          self.spec_resource_class ||=
-            self.spec_resource_name.constantize
+          self.spec_collection_name ||=
+            self.spec_resource_name.pluralize
 
           build_openapi_definitions
           build_openapi_paths
@@ -88,9 +89,9 @@ module Openapi
         end
 
         def build_openapi_definitions
-          collection_name = spec_collection_name
-          resource_class = spec_resource_class
-          resource_name = spec_resource_name
+          collection_name        = spec_collection_name
+          resource_class         = spec_resource_class
+          resource_name          = spec_resource_name
           resource_property_name = resource_name.underscore.to_sym
 
           swagger_schema resource_name do
@@ -169,7 +170,7 @@ module Openapi
               if include_index
                 operation :get do
                   key :tags,        [plural_name]
-                  key :summary,     'Index'
+                  key :summary,     "index#{plural_name}"
                   key :operationId, "index#{plural_name}"
                   key :produces,    json_mime
 
@@ -257,7 +258,7 @@ module Openapi
               if include_create
                 operation :post do
                   key :tags,        [plural_name]
-                  key :summary,     'Create'
+                  key :summary,     "create#{plural_name}"
                   key :operationId, "create#{plural_name}"
                   key :produces,    json_mime
 
@@ -309,7 +310,7 @@ module Openapi
               if include_show
                 operation :get do
                   key :tags,        [plural_name]
-                  key :summary,     'Show'
+                  key :summary,     "show#{name}ById"
                   key :operationId, "show#{name}ById"
                   key :produces,    json_mime
 
@@ -354,7 +355,7 @@ module Openapi
               if include_update
                 operation :put do
                   key :tags,        [plural_name]
-                  key :summary,     'Update'
+                  key :summary,     "update#{name}"
                   key :operationId, "update#{name}"
                   key :produces,    json_mime
 
@@ -408,7 +409,7 @@ module Openapi
               if include_destroy
                 operation :delete do
                   key :tags,        [plural_name]
-                  key :summary,     'Destroy'
+                  key :summary,     "destroy#{name}"
                   key :operationId, "destroy#{name}"
 
                   parameter do
