@@ -258,8 +258,8 @@ module Openapi
               if include_create
                 operation :post do
                   key :tags,        [plural_name]
-                  key :summary,     "create#{plural_name}"
-                  key :operationId, "create#{plural_name}"
+                  key :summary,     "create#{name}"
+                  key :operationId, "create#{name}"
                   key :produces,    json_mime
 
                   parameter do
