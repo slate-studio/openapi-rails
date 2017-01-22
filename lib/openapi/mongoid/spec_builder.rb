@@ -69,6 +69,16 @@ module Openapi
           self.spec_resource_class ||=
             self.try(:crud_resource_class)
 
+          self.spec_resource_class ||=
+            self.to_s.
+              split('::').
+              last.
+              sub(/Controller$/, '').
+              singularize.
+              constantize
+
+          ap self.spec_resource_class
+
           self.spec_resource_name ||=
             self.spec_resource_class.to_s.remove('::')
 
