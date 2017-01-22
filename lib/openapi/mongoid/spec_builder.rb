@@ -77,8 +77,6 @@ module Openapi
               singularize.
               constantize
 
-          ap self.spec_resource_class
-
           self.spec_resource_name ||=
             self.spec_resource_class.to_s.remove('::')
 
