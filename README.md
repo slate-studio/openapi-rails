@@ -23,7 +23,7 @@ gem 'openapi-rails'
 For new projects we recommend to run generator to create basic setup:
 
 ```
-rake g openapi:config
+rails g openapi:config
 ```
 
 If you have an existing project, please look through this readme file first to
