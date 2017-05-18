@@ -305,6 +305,14 @@ module Openapi
                       key :'$ref', name
                     end
                   end
+
+                  response 422 do
+                    key :description, 'UnprocessableEntityError'
+                    schema do
+                      key :'$ref', name
+                    end
+                  end
+
                 end
               end
             end
@@ -409,6 +417,14 @@ module Openapi
                       key :'$ref', name
                     end
                   end
+
+                  response 422 do
+                    key :description, 'UnprocessableEntityError'
+                    schema do
+                      key :'$ref', name
+                    end
+                  end
+
                 end
               end
 
