@@ -307,7 +307,7 @@ module Openapi
                   end
 
                   response 422 do
-                    key :description, 'UnprocessableEntityError'
+                    key :description, 'Unprocessable entity error'
                     schema do
                       key :'$ref', name
                     end
@@ -419,7 +419,7 @@ module Openapi
                   end
 
                   response 422 do
-                    key :description, 'UnprocessableEntityError'
+                    key :description, 'Unprocessable entity error'
                     schema do
                       key :'$ref', name
                     end
